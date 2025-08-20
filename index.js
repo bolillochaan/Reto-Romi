@@ -23,13 +23,19 @@ document.addEventListener('DOMContentLoaded', function() {
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
+        
+        // Insertar la alerta al principio del formulario correspondiente
         if (form === 'register') {
             registerForm.prepend(alertDiv);
         } else {
             loginForm.prepend(alertDiv);
         }
+        
+        // Eliminar la alerta después de 5 segundos
         setTimeout(() => {
-            if (alertDiv.parentNode) alertDiv.remove();
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
         }, 5000);
     }
 
@@ -40,12 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
         this.querySelector('i').classList.toggle('bi-eye');
         this.querySelector('i').classList.toggle('bi-eye-slash');
     });
+
     toggleConfirmPassword.addEventListener('click', function() {
         const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         confirmPasswordInput.setAttribute('type', type);
         this.querySelector('i').classList.toggle('bi-eye');
         this.querySelector('i').classList.toggle('bi-eye-slash');
     });
+
     toggleLoginPassword.addEventListener('click', function() {
         const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         loginPasswordInput.setAttribute('type', type);
@@ -59,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasNumber = /[0-9]/.test(password);
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
         const isLongEnough = password.length >= 8;
+        
         return {
             isValid: hasUpperCase && hasNumber && hasSpecialChar && isLongEnough,
             hasUpperCase,
@@ -70,63 +79,88 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para actualizar la visualización de requisitos de contraseña
     function updatePasswordRequirements(password) {
+        // Verificar si los elementos existen antes de intentar acceder a ellos
         const uppercaseReq = document.getElementById('uppercaseReq');
         const numberReq = document.getElementById('numberReq');
         const specialCharReq = document.getElementById('specialCharReq');
         const lengthReq = document.getElementById('lengthReq');
-        if (!uppercaseReq || !numberReq || !specialCharReq || !lengthReq) return false;
+        
+        // Si los elementos no existen, salir de la función
+        if (!uppercaseReq || !numberReq || !specialCharReq || !lengthReq) {
+            return false;
+        }
+        
         const requirements = checkPasswordStrength(password);
+        
         uppercaseReq.classList.toggle('text-success', requirements.hasUpperCase);
         uppercaseReq.classList.toggle('text-danger', !requirements.hasUpperCase);
         uppercaseReq.querySelector('i').className = requirements.hasUpperCase ? 'bi bi-check-circle' : 'bi bi-x-circle';
+        
         numberReq.classList.toggle('text-success', requirements.hasNumber);
         numberReq.classList.toggle('text-danger', !requirements.hasNumber);
         numberReq.querySelector('i').className = requirements.hasNumber ? 'bi bi-check-circle' : 'bi bi-x-circle';
+        
         specialCharReq.classList.toggle('text-success', requirements.hasSpecialChar);
         specialCharReq.classList.toggle('text-danger', !requirements.hasSpecialChar);
         specialCharReq.querySelector('i').className = requirements.hasSpecialChar ? 'bi bi-check-circle' : 'bi bi-x-circle';
+        
         lengthReq.classList.toggle('text-success', requirements.isLongEnough);
         lengthReq.classList.toggle('text-danger', !requirements.isLongEnough);
         lengthReq.querySelector('i').className = requirements.isLongEnough ? 'bi bi-check-circle' : 'bi bi-x-circle';
+        
         return requirements.isValid;
     }
 
     // Validación en tiempo real de la contraseña
-    passwordInput.addEventListener('input', function() {
+    document.getElementById('password').addEventListener('input', function() {
         updatePasswordRequirements(this.value);
     });
 
     // Manejar el registro de usuarios
     registerForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        
         const firstName = document.getElementById('firstName').value.trim();
         const lastName = document.getElementById('lastName').value.trim();
         const email = document.getElementById('email').value.trim();
-        const password = passwordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        // Validaciones básicas
         if (firstName === '' || lastName === '') {
             showAlert('Por favor, ingresa tu nombre y apellidos.', 'danger');
             return;
         }
+        
+        // Validación de contraseña
         const passwordStrength = checkPasswordStrength(password);
         if (!passwordStrength.isValid) {
             showAlert('La contraseña debe contener al menos una mayúscula, un número, un carácter especial y tener al menos 8 caracteres.', 'danger');
             return;
         }
+        
         if (password !== confirmPassword) {
             showAlert('Las contraseñas no coinciden.', 'danger');
             return;
         }
+        
+        // Validar formato de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             showAlert('Por favor, ingresa un correo electrónico válido.', 'danger');
             return;
         }
+        
+        // Obtener usuarios existentes
         const users = JSON.parse(localStorage.getItem('users'));
+        
+        // Verificar si el usuario ya existe
         if (users.some(user => user.email === email)) {
             showAlert('Este correo electrónico ya está registrado.', 'danger');
             return;
         }
+        
+        // Añadir nuevo usuario
         users.push({
             firstName,
             lastName,
@@ -134,26 +168,51 @@ document.addEventListener('DOMContentLoaded', function() {
             email,
             password // En una aplicación real, esto debería estar encriptado
         });
+        
+        // Guardar en localStorage
         localStorage.setItem('users', JSON.stringify(users));
+        
+        // Mostrar mensaje de éxito
         showAlert('¡Registro exitoso! Ahora puedes iniciar sesión.');
+        
+        // Limpiar formulario
         registerForm.reset();
+        
+        // Resetear los indicadores de contraseña
+        updatePasswordRequirements('');
+        
+        // Cambiar a la pestaña de login
         document.getElementById('login-tab').click();
     });
 
     // Manejar el inicio de sesión
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        
         const email = document.getElementById('loginEmail').value.trim();
-        const password = loginPasswordInput.value;
+        const password = document.getElementById('loginPassword').value;
+        
+        // Obtener usuarios
         const users = JSON.parse(localStorage.getItem('users'));
+        
+        // Buscar usuario
         const user = users.find(user => user.email === email && user.password === password);
+        
         if (user) {
+            // Guardar sesión
             localStorage.setItem('currentUser', JSON.stringify(user));
-            if (email === 'admin@example.com') renderAdminPanel(users);
+            
+            // Mostrar contenido de administración si es el correo específico
+            if (email === 'admin@example.com') {
+                renderAdminPanel(users);
+            }
+            
             showAlert('¡Inicio de sesión exitoso!', 'success', 'login');
         } else {
             showAlert('Credenciales incorrectas. Inténtalo de nuevo.', 'danger', 'login');
         }
+        
+        // Limpiar formulario
         loginForm.reset();
     });
 
@@ -193,9 +252,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 </table>
             </div>
         `;
+
+        // Agregar evento para descargar JSON
         document.getElementById('downloadJson').addEventListener('click', function() {
             downloadUsersJSON(users);
         });
+
+        // Agregar eventos para eliminar usuarios
         document.querySelectorAll('.delete-user').forEach(button => {
             button.addEventListener('click', function() {
                 const email = this.getAttribute('data-email');
@@ -208,7 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function downloadUsersJSON(users) {
         const dataStr = JSON.stringify(users, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
         const exportFileDefaultName = 'usuarios.json';
+        
         const linkElement = document.createElement('a');
         linkElement.setAttribute('href', dataUri);
         linkElement.setAttribute('download', exportFileDefaultName);
@@ -220,6 +285,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let users = JSON.parse(localStorage.getItem('users'));
         users = users.filter(user => user.email !== email);
         localStorage.setItem('users', JSON.stringify(users));
+        
+        // Volver a renderizar
         renderAdminPanel(users);
     }
 
