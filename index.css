@@ -1,0 +1,121 @@
+.card {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: none;
+    border-radius: 1rem;
+}
+
+.section {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
+.password-toggle {
+    cursor: pointer;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #6f42c1 0%, #20c997 100%);
+    color: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.feature-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #6f42c1;
+}
+
+/* Estilos adicionales para mejorar la apariencia */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #6f42c1;
+}
+
+.btn-primary {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+}
+
+.btn-primary:hover {
+    background-color: #5a32a3;
+    border-color: #5a32a3;
+}
+
+.alert {
+    border-radius: 0.75rem;
+}
+
+.table th {
+    border-top: none;
+    background-color: #f8f9fa;
+}
+
+/* Animaciones suaves */
+.card, .btn, .form-control, .nav-pills .nav-link {
+    transition: all 0.3s ease;
+}
+
+/* Efecto de hover en las tarjetas */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+}
+
+/* Estilo para el botón de descarga */
+#downloadJson {
+    background-color: #20c997;
+    border-color: #20c997;
+}
+
+#downloadJson:hover {
+    background-color: #199d76;
+    border-color: #199d76;
+}
+
+.password-requirements {
+    font-size: 0.85rem;
+}
+
+.password-requirements ul li {
+    margin-bottom: 0.2rem;
+}
+
+.password-requirements .bi-check-circle {
+    color: #198754;
+}
+
+.password-requirements .bi-x-circle {
+    color: #dc3545;
+}
+
+.text-success {
+    color: #198754 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+/* Estilos para los campos de nombre y apellidos en la misma fila */
+@media (min-width: 768px) {
+    .row .col-md-6 {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+    
+    .row .col-md-6:first-child {
+        padding-left: 0;
+    }
+    
+    .row .col-md-6:last-child {
+        padding-right: 0;
+    }
+}
