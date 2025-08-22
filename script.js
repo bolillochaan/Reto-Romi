@@ -4,6 +4,19 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('users', JSON.stringify([]));
     }
 
+    // Asegurar que el usuario admin exista
+    let users = JSON.parse(localStorage.getItem('users'));
+    if (!users.some(user => user.email === 'admin@admin.com')) {
+        users.push({
+            firstName: 'Admin',
+            lastName: 'Principal',
+            fullName: 'Admin Principal',
+            email: 'admin@admin.com',
+            password: 'Administrador123!'
+        });
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+
     // Referencias a elementos del DOM
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
@@ -41,6 +54,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 alertDiv.remove();
             }
         }, 5000);
+    }
+
+    // Función para mostrar errores con SweetAlert
+    function showErrorAlert(message, title = 'Error') {
+        Swal.fire({
+            icon: 'error',
+            title: title,
+            text: message,
+            confirmButtonText: 'Entendido'
+        });
     }
 
     // Alternar visibilidad de contraseña
@@ -160,33 +183,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Validaciones básicas
             if (firstName === '' || lastName === '') {
-                showAlert('Por favor, ingresa tu nombre y apellidos.', 'danger');
+                showErrorAlert('Por favor, ingresa tu nombre y apellidos.', 'Campos incompletos');
                 return;
             }
 
             // Validar que solo haya letras y espacios
             const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
             if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
-                showAlert('El nombre y los apellidos solo pueden contener letras y espacios.', 'danger');
+                showErrorAlert('El nombre y los apellidos solo pueden contener letras y espacios.', 'Caracteres inválidos');
                 return;
             }
 
             // Validación de contraseña
             const passwordStrength = checkPasswordStrength(password);
             if (!passwordStrength.isValid) {
-                showAlert('La contraseña debe contener al menos una mayúscula, un número, un carácter especial y tener al menos 8 caracteres.', 'danger');
+                let errorMessage = 'La contraseña no cumple con los siguientes requisitos:';
+                if (!passwordStrength.hasUpperCase) errorMessage += '\n- Al menos una letra mayúscula';
+                if (!passwordStrength.hasNumber) errorMessage += '\n- Al menos un número';
+                if (!passwordStrength.hasSpecialChar) errorMessage += '\n- Al menos un carácter especial';
+                if (!passwordStrength.isLongEnough) errorMessage += '\n- Mínimo 8 caracteres de longitud';
+                
+                showErrorAlert(errorMessage, 'Contraseña débil');
                 return;
             }
 
             if (password !== confirmPassword) {
-                showAlert('Las contraseñas no coinciden.', 'danger');
+                showErrorAlert('Las contraseñas no coinciden. Por favor, verifica que ambas contraseñas sean idénticas.', 'Contraseñas no coinciden');
                 return;
             }
 
             // Validar formato de email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
-                showAlert('Por favor, ingresa un correo electrónico válido.', 'danger');
+                showErrorAlert('Por favor, ingresa un correo electrónico válido con el formato: usuario@dominio.com', 'Correo electrónico inválido');
+                return;
+            }
+
+            // Bloquear cualquier correo con dominio admin.com
+            if (/@admin\.com$/i.test(email)) {
+                showErrorAlert('No puedes registrar un usuario con el dominio "admin.com".', 'Correo no permitido');
                 return;
             }
             
@@ -195,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Verificar si el usuario ya existe
             if (users.some(user => user.email === email)) {
-                showAlert('Este correo electrónico ya está registrado.', 'danger');
+                showErrorAlert('Este correo electrónico ya está registrado. Por favor, utiliza otro correo o inicia sesión.', 'Usuario existente');
                 return;
             }
             
@@ -253,6 +288,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
+            // Validar que se hayan ingresado credenciales
+            if (!email || !password) {
+                showErrorAlert('Por favor, ingresa tanto el correo electrónico como la contraseña.', 'Campos incompletos');
+                return;
+            }
+            
             // Obtener usuarios
             const users = JSON.parse(localStorage.getItem('users'));
             
@@ -271,15 +312,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     toggleAdminTab(false);
                 }
                 
-                // Mostrar mensaje de éxito con SweetAlert
+                // Mostrar mensaje de éxito with SweetAlert
                 Swal.fire({
                     icon: 'success',
                     title: '¡Inicio de sesión exitoso!',
-                    text: 'Bienvenido.',
+                    text: `Bienvenido/a, ${user.firstName}.`,
                     confirmButtonText: 'Aceptar'
                 });
             } else {
-                showAlert('Credenciales incorrectas. Inténtalo de nuevo.', 'danger', 'login');
+                // Verificar si el correo existe pero la contraseña es incorrecta
+                const emailExists = users.some(user => user.email === email);
+                
+                if (emailExists) {
+                    showErrorAlert('La contraseña ingresada es incorrecta. Por favor, verifica tus credenciales.', 'Contraseña incorrecta');
+                } else {
+                    showErrorAlert('No existe una cuenta asociada a este correo electrónico. Por favor, regístrate primero.', 'Usuario no encontrado');
+                }
             }
             
             // Limpiar formulario
@@ -349,21 +397,49 @@ document.addEventListener('DOMContentLoaded', function() {
         linkElement.setAttribute('href', dataUri);
         linkElement.setAttribute('download', exportFileDefaultName);
         linkElement.click();
+        
+        // Mostrar confirmación
+        Swal.fire({
+            icon: 'success',
+            title: 'Descarga completada',
+            text: 'El archivo JSON se ha descargado correctamente.',
+            confirmButtonText: 'Aceptar',
+            timer: 3000
+        });
     }
 
     // Función para eliminar usuario
     function deleteUser(email) {
-        let users = JSON.parse(localStorage.getItem('users'));
-        users = users.filter(user => user.email !== email);
-        localStorage.setItem('users', JSON.stringify(users));
-        
-        // Volver a renderizar
-        renderAdminPanel(users);
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción eliminará permanentemente al usuario. ¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let users = JSON.parse(localStorage.getItem('users'));
+                users = users.filter(user => user.email !== email);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // Volver a renderizar
+                renderAdminPanel(users);
+                
+                Swal.fire(
+                    '¡Eliminado!',
+                    'El usuario ha sido eliminado correctamente.',
+                    'success'
+                );
+            }
+        });
     }
 
     // Al cargar la página, verifica si hay sesión activa y si es admin
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    if (currentUser && currentUser.email === 'admin@example.com') {
+    if (currentUser && currentUser.email === 'admin@admin.com') {
         const users = JSON.parse(localStorage.getItem('users'));
         toggleAdminTab(true);
         renderAdminPanel(users);
@@ -371,6 +447,6 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleAdminTab(false);
     }
 
-    // Inicializar los requisitos de contraseña (mostrar todos en rojo)
+    // Inicializar los requisitos de contraseña en rojo
     updatePasswordRequirements('');
 });
