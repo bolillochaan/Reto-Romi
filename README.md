@@ -128,11 +128,10 @@ Usuario → DOM Events → JavaScript Logic → localStorage → UI Update
 5. **Persistencia:**  
    - Todos los datos se guardan y consultan desde `localStorage`, por lo que la información persiste entre recargas de página.
 
----
 
 ![Diagrama del flujo](Diagrama.png)
 
-
+---
 
 ## Requisitos para ejecutar
 
