@@ -28,9 +28,7 @@ Este proyecto es una aplicación web sencilla para la gestión de usuarios, desa
 
 ---
 
-## Estructura y arquitectura
-
-**Monolítica Cliente**  
+## Estructura y arquitectura monolítica cliente
 
 
 **Patrón Arquitectónico:**
@@ -132,7 +130,7 @@ Usuario → DOM Events → JavaScript Logic → localStorage → UI Update
 
 ---
 
-![Diagrama del flujo](Reto-Romi/Diagrama.png)
+![Diagrama del flujo](assets/Diagrama.png)
 
 
 
