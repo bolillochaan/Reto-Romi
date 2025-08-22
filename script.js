@@ -211,8 +211,13 @@ document.addEventListener('DOMContentLoaded', function() {
             // Guardar en localStorage
             localStorage.setItem('users', JSON.stringify(users));
             
-            // Mostrar mensaje de éxito
-            showAlert('¡Registro exitoso! Ahora puedes iniciar sesión.');
+            // Mostrar mensaje de éxito con SweetAlert
+            Swal.fire({
+                icon: 'success',
+                title: '¡Registro exitoso!',
+                text: 'Ahora puedes iniciar sesión.',
+                confirmButtonText: 'Aceptar'
+            });
             
             // Limpiar formulario
             registerForm.reset();
@@ -266,7 +271,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     toggleAdminTab(false);
                 }
                 
-                showAlert('¡Inicio de sesión exitoso!', 'success', 'login');
+                // Mostrar mensaje de éxito con SweetAlert
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Inicio de sesión exitoso!',
+                    text: 'Bienvenido.',
+                    confirmButtonText: 'Aceptar'
+                });
             } else {
                 showAlert('Credenciales incorrectas. Inténtalo de nuevo.', 'danger', 'login');
             }
