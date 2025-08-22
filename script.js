@@ -1,10 +1,13 @@
+/**
+ * Script principal para la gestión de usuarios.
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar datos si no existen
+    // Inicializa el arreglo de usuarios en localStorage si no existe
     if (!localStorage.getItem('users')) {
         localStorage.setItem('users', JSON.stringify([]));
     }
 
-    // Asegurar que el usuario admin exista
+    // Asegura que el usuario admin exista
     let users = JSON.parse(localStorage.getItem('users'));
     if (!users.some(user => user.email === 'admin@admin.com')) {
         users.push({
@@ -28,27 +31,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginPasswordInput = document.getElementById('loginPassword');
     const adminContent = document.getElementById('adminContent');
 
-    // Función para mostrar notificaciones
+    /**
+     * Muestra una alerta Bootstrap en el formulario correspondiente.
+     */
     function showAlert(message, type = 'success', form = 'register') {
-        // Eliminar alertas existentes primero
+        // Elimina alertas existentes
         const existingAlerts = document.querySelectorAll('.alert');
         existingAlerts.forEach(alert => alert.remove());
-        
+
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
         alertDiv.innerHTML = `
             ${message}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        
-        // Insertar la alerta al principio del formulario correspondiente
+
+        // Inserta la alerta en el formulario correspondiente
         if (form === 'register') {
             registerForm.prepend(alertDiv);
         } else {
             loginForm.prepend(alertDiv);
         }
-        
-        // Eliminar la alerta después de 5 segundos
+
+        // Elimina la alerta después de 5 segundos
         setTimeout(() => {
             if (alertDiv.parentNode) {
                 alertDiv.remove();
@@ -56,7 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 
-    // Función para mostrar errores con SweetAlert
+    /**
+     * Muestra un error usando SweetAlert2.
+     */
     function showErrorAlert(message, title = 'Error') {
         Swal.fire({
             icon: 'error',
@@ -66,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Alternar visibilidad de contraseña
+    // Alternar visibilidad de contraseñas en los formularios
     if (togglePassword) {
         togglePassword.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -75,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.querySelector('i').classList.toggle('bi-eye-slash');
         });
     }
-
     if (toggleConfirmPassword) {
         toggleConfirmPassword.addEventListener('click', function() {
             const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -84,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.querySelector('i').classList.toggle('bi-eye-slash');
         });
     }
-
     if (toggleLoginPassword) {
         toggleLoginPassword.addEventListener('click', function() {
             const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -94,13 +99,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Función para verificar fortaleza de la contraseña en tiempo real
+    /**
+     * Verifica la fortaleza de la contraseña.
+     */
     function checkPasswordStrength(password) {
         const hasUpperCase = /[A-Z]/.test(password);
         const hasNumber = /[0-9]/.test(password);
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
         const isLongEnough = password.length >= 8;
-        
         return {
             isValid: hasUpperCase && hasNumber && hasSpecialChar && isLongEnough,
             hasUpperCase,
@@ -110,40 +116,35 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Función para actualizar la visualización de requisitos de contraseña
+    /**
+     * Actualiza los requisitos visuales de la contraseña.
+     */
     function updatePasswordRequirements(password) {
         const uppercaseReq = document.getElementById('uppercaseReq');
         const numberReq = document.getElementById('numberReq');
         const specialCharReq = document.getElementById('specialCharReq');
         const lengthReq = document.getElementById('lengthReq');
-        
-        // Si los elementos no existen, salir de la función
-        if (!uppercaseReq || !numberReq || !specialCharReq || !lengthReq) {
-            return false;
-        }
-        
+        if (!uppercaseReq || !numberReq || !specialCharReq || !lengthReq) return false;
+
         const requirements = checkPasswordStrength(password);
-        
-        // Actualizar mayúsculas
+
+        // Actualiza los estilos de los requisitos
         uppercaseReq.classList.toggle('text-success', requirements.hasUpperCase);
         uppercaseReq.classList.toggle('text-danger', !requirements.hasUpperCase);
         uppercaseReq.querySelector('i').className = requirements.hasUpperCase ? 'bi bi-check-circle' : 'bi bi-x-circle';
-        
-        // Actualizar números
+
         numberReq.classList.toggle('text-success', requirements.hasNumber);
         numberReq.classList.toggle('text-danger', !requirements.hasNumber);
         numberReq.querySelector('i').className = requirements.hasNumber ? 'bi bi-check-circle' : 'bi bi-x-circle';
-        
-        // Actualizar caracteres especiales
+
         specialCharReq.classList.toggle('text-success', requirements.hasSpecialChar);
         specialCharReq.classList.toggle('text-danger', !requirements.hasSpecialChar);
         specialCharReq.querySelector('i').className = requirements.hasSpecialChar ? 'bi bi-check-circle' : 'bi bi-x-circle';
-        
-        // Actualizar longitud
+
         lengthReq.classList.toggle('text-success', requirements.isLongEnough);
         lengthReq.classList.toggle('text-danger', !requirements.isLongEnough);
         lengthReq.querySelector('i').className = requirements.isLongEnough ? 'bi bi-check-circle' : 'bi bi-x-circle';
-        
+
         return requirements.isValid;
     }
 
@@ -154,11 +155,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validación en tiempo real para nombres y apellidos
+    // Solo permite letras y espacios en nombres y apellidos
     const firstNameInput = document.getElementById('firstName');
     const lastNameInput = document.getElementById('lastName');
     const onlyLetters = /[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g;
-
     if (firstNameInput) {
         firstNameInput.addEventListener('input', function() {
             this.value = this.value.replace(onlyLetters, '');
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Manejar el registro de usuarios
+    // Maneja el registro de usuarios
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -181,13 +181,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            // Validaciones básicas
+            // Validaciones de campos
             if (firstName === '' || lastName === '') {
                 showErrorAlert('Por favor, ingresa tu nombre y apellidos.', 'Campos incompletos');
                 return;
             }
-
-            // Validar que solo haya letras y espacios
             const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
             if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
                 showErrorAlert('El nombre y los apellidos solo pueden contener letras y espacios.', 'Caracteres inválidos');
@@ -202,70 +200,59 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!passwordStrength.hasNumber) errorMessage += '\n- Al menos un número';
                 if (!passwordStrength.hasSpecialChar) errorMessage += '\n- Al menos un carácter especial';
                 if (!passwordStrength.isLongEnough) errorMessage += '\n- Mínimo 8 caracteres de longitud';
-                
                 showErrorAlert(errorMessage, 'Contraseña débil');
                 return;
             }
-
             if (password !== confirmPassword) {
                 showErrorAlert('Las contraseñas no coinciden. Por favor, verifica que ambas contraseñas sean idénticas.', 'Contraseñas no coinciden');
                 return;
             }
 
-            // Validar formato de email
+            // Validación de email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showErrorAlert('Por favor, ingresa un correo electrónico válido con el formato: usuario@dominio.com', 'Correo electrónico inválido');
                 return;
             }
-
-            // Bloquear cualquier correo con dominio admin.com
+            // Bloquea cualquier correo con dominio admin.com
             if (/@admin\.com$/i.test(email)) {
                 showErrorAlert('No puedes registrar un usuario con el dominio "admin.com".', 'Correo no permitido');
                 return;
             }
-            
-            // Obtener usuarios existentes
+
+            // Verifica si el usuario ya existe
             const users = JSON.parse(localStorage.getItem('users'));
-            
-            // Verificar si el usuario ya existe
             if (users.some(user => user.email === email)) {
                 showErrorAlert('Este correo electrónico ya está registrado. Por favor, utiliza otro correo o inicia sesión.', 'Usuario existente');
                 return;
             }
-            
-            // Añadir nuevo usuario
+
+            // Añade el nuevo usuario
             users.push({
                 firstName,
                 lastName,
                 fullName: `${firstName} ${lastName}`,
                 email,
-                password // En una aplicación real, esto debería estar encriptado
+                password // Nota: en producción, nunca guardar contraseñas en texto plano
             });
-            
-            // Guardar en localStorage
             localStorage.setItem('users', JSON.stringify(users));
-            
-            // Mostrar mensaje de éxito con SweetAlert
+
+            // Mensaje de éxito y cambio de pestaña
             Swal.fire({
                 icon: 'success',
                 title: '¡Registro exitoso!',
                 text: 'Ahora puedes iniciar sesión.',
                 confirmButtonText: 'Aceptar'
             });
-            
-            // Limpiar formulario
             registerForm.reset();
-            
-            // Resetear los indicadores de contraseña
             updatePasswordRequirements('');
-            
-            // Cambiar a la pestaña de login
             document.getElementById('login-tab').click();
         });
     }
 
-    // Función para mostrar/ocultar la pestaña y sección de administración
+    /**
+     * Muestra u oculta la pestaña de administración.
+     */
     function toggleAdminTab(show) {
         const adminTabItem = document.getElementById('admin-tab-item');
         const adminTabPane = document.getElementById('admin');
@@ -280,39 +267,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Manejar el inicio de sesión
+    // Maneja el inicio de sesión
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
-            
-            // Validar que se hayan ingresado credenciales
+
             if (!email || !password) {
                 showErrorAlert('Por favor, ingresa tanto el correo electrónico como la contraseña.', 'Campos incompletos');
                 return;
             }
-            
-            // Obtener usuarios
+
             const users = JSON.parse(localStorage.getItem('users'));
-            
-            // Buscar usuario
             const user = users.find(user => user.email === email && user.password === password);
-            
+
             if (user) {
-                // Guardar sesión
                 localStorage.setItem('currentUser', JSON.stringify(user));
-                
-                // Mostrar contenido de administración si es el correo específico
-                if (email === 'admin@example.com') {
+                // Solo el admin puede ver el panel de administración
+                if (email === 'admin@admin.com') {
                     toggleAdminTab(true);
                     renderAdminPanel(users);
                 } else {
                     toggleAdminTab(false);
                 }
-                
-                // Mostrar mensaje de éxito with SweetAlert
                 Swal.fire({
                     icon: 'success',
                     title: '¡Inicio de sesión exitoso!',
@@ -320,29 +299,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     confirmButtonText: 'Aceptar'
                 });
             } else {
-                // Verificar si el correo existe pero la contraseña es incorrecta
                 const emailExists = users.some(user => user.email === email);
-                
                 if (emailExists) {
                     showErrorAlert('La contraseña ingresada es incorrecta. Por favor, verifica tus credenciales.', 'Contraseña incorrecta');
                 } else {
                     showErrorAlert('No existe una cuenta asociada a este correo electrónico. Por favor, regístrate primero.', 'Usuario no encontrado');
                 }
             }
-            
-            // Limpiar formulario
             loginForm.reset();
         });
     }
 
-    // Función para renderizar el panel de administración
+    /**
+     * Renderiza el panel de administración con la lista de usuarios y el botón de cerrar sesión.
+     */
     function renderAdminPanel(users) {
         adminContent.innerHTML = `
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h3>Gestión de Usuarios</h3>
-                <button class="btn btn-success" id="downloadJson">
-                    <i class="bi bi-download"></i> Descargar JSON
-                </button>
+                <div>
+                    <button class="btn btn-danger me-2" id="logoutAdmin">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                    </button>
+                    <button class="btn btn-success" id="downloadJson">
+                        <i class="bi bi-download"></i> Descargar JSON
+                    </button>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -372,12 +354,26 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
 
-        // Agregar evento para descargar JSON
+        // Evento para cerrar sesión del admin
+        document.getElementById('logoutAdmin').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            toggleAdminTab(false);
+            Swal.fire({
+                icon: 'info',
+                title: 'Sesión cerrada',
+                text: 'Has cerrado sesión como administrador.',
+                confirmButtonText: 'Aceptar'
+            });
+            // Opcional: cambiar a la pestaña de login
+            document.getElementById('login-tab').click();
+        });
+
+        // Evento para descargar usuarios en JSON
         document.getElementById('downloadJson').addEventListener('click', function() {
             downloadUsersJSON(users);
         });
 
-        // Agregar eventos para eliminar usuarios
+        // Evento para eliminar usuarios
         document.querySelectorAll('.delete-user').forEach(button => {
             button.addEventListener('click', function() {
                 const email = this.getAttribute('data-email');
@@ -386,19 +382,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Función para descargar usuarios en formato JSON
+    /**
+     * Descarga la lista de usuarios en formato JSON.
+     */
     function downloadUsersJSON(users) {
         const dataStr = JSON.stringify(users, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-        
+        const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
         const exportFileDefaultName = 'usuarios.json';
-        
+
         const linkElement = document.createElement('a');
         linkElement.setAttribute('href', dataUri);
         linkElement.setAttribute('download', exportFileDefaultName);
         linkElement.click();
-        
-        // Mostrar confirmación
+
         Swal.fire({
             icon: 'success',
             title: 'Descarga completada',
@@ -408,7 +404,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Función para eliminar usuario
+    /**
+     * Elimina un usuario y actualiza el panel de administración.
+     */
     function deleteUser(email) {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -424,10 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let users = JSON.parse(localStorage.getItem('users'));
                 users = users.filter(user => user.email !== email);
                 localStorage.setItem('users', JSON.stringify(users));
-                
-                // Volver a renderizar
                 renderAdminPanel(users);
-                
                 Swal.fire(
                     '¡Eliminado!',
                     'El usuario ha sido eliminado correctamente.',
@@ -447,6 +442,6 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleAdminTab(false);
     }
 
-    // Inicializar los requisitos de contraseña en rojo
+    // Inicializa los requisitos de contraseña en rojo
     updatePasswordRequirements('');
 });
