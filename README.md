@@ -30,6 +30,74 @@ Este proyecto es una aplicación web sencilla para la gestión de usuarios, desa
 
 ## Estructura y arquitectura
 
+<details>
+<summary> Monolítica Cliente</summary>
+
+**Patrón Arquitectónico:**
+
+* SPA (Single Page Application) con arquitectura de 3 capas
+* Patrón MVC Frontend (Model-View-Controller)
+
+</details>
+
+<details>
+<summary>Capas de la Arquitectura</summary>
+
+### Capa de Presentación (View)
+
+* HTML5 (Estructura semántica)
+* Bootstrap 5 (Framework CSS)
+* Bootstrap Icons (Iconografía)
+* SweetAlert2 (Notificaciones)
+* CSS personalizado (Estilos)
+
+### Capa de Lógica (Controller)
+
+Archivo: `script.js`
+
+* Event Handlers (Eventos DOM)
+* Validation Logic (Validaciones)
+* Business Rules (Reglas de negocio)
+* State Management (Gestión de estado)
+* UI Updates (Actualización interfaz)
+
+### Capa de Datos (Model)
+
+Uso de `localStorage`
+
+* `users[]` (Colección usuarios)
+* `currentUser{}` (Usuario activo)
+* JSON Structure (Estructura de datos)
+
+</details>
+
+<details>
+<summary>Patrones de Diseño Implementados</summary>
+
+* MVC para separación de responsabilidades
+* SPA para carga dinámica
+* Uso de patrones modulares en JavaScript
+
+</details>
+
+<details>
+<summary>Flujo Arquitectónico</summary>
+
+**Flujo de Datos Unidireccional:**
+Usuario → DOM Events → JavaScript Logic → localStorage → UI Update
+
+**Ciclo de Vida de la Aplicación:**
+
+1. Inicialización: Carga DOM e inicializa localStorage
+2. Interacción: Usuario activa eventos
+3. Procesamiento: Validación y lógica de negocio
+4. Persistencia: Almacenamiento en localStorage
+5. Renderización: Actualización de la interfaz
+
+</details>
+
+
+
 ### Archivos principales
 
 - **index.html**  
@@ -69,16 +137,9 @@ Este proyecto es una aplicación web sencilla para la gestión de usuarios, desa
 
 ---
 
-## Consideraciones de seguridad
+![Diagrama del flujo](assets/Diagrama.png)
 
-- **Contraseñas:**  
-  Las contraseñas se almacenan en texto plano en `localStorage`. 
- 
 
-- **Restricciones de correo:**  
-  No se permite registrar usuarios con el dominio `admin.com` para evitar conflictos con la cuenta de administrador.
-
----
 
 ## Requisitos para ejecutar
 
@@ -97,4 +158,5 @@ Este proyecto es una aplicación web sencilla para la gestión de usuarios, desa
 - [Google Fonts - Inter](https://fonts.google.com/specimen/Inter)
 
 ---
+
 
