@@ -30,15 +30,13 @@ Este proyecto es una aplicación web sencilla para la gestión de usuarios, desa
 
 ## Estructura y arquitectura
 
-<details>
-<summary> Monolítica Cliente</summary>
+**Monolítica Cliente**  
+
 
 **Patrón Arquitectónico:**
 
 * SPA (Single Page Application) con arquitectura de 3 capas
 * Patrón MVC Frontend (Model-View-Controller)
-
-</details>
 
 <details>
 <summary>Capas de la Arquitectura</summary>
@@ -80,8 +78,7 @@ Uso de `localStorage`
 
 </details>
 
-<details>
-<summary>Flujo Arquitectónico</summary>
+**Flujo Arquitectónico**
 
 **Flujo de Datos Unidireccional:**
 Usuario → DOM Events → JavaScript Logic → localStorage → UI Update
@@ -93,9 +90,6 @@ Usuario → DOM Events → JavaScript Logic → localStorage → UI Update
 3. Procesamiento: Validación y lógica de negocio
 4. Persistencia: Almacenamiento en localStorage
 5. Renderización: Actualización de la interfaz
-
-</details>
-
 
 
 ### Archivos principales
