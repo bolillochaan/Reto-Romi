@@ -91,6 +91,7 @@ Usuario → DOM Events → JavaScript Logic → localStorage → UI Update
 4. Persistencia: Almacenamiento en localStorage
 5. Renderización: Actualización de la interfaz
 
+---
 
 ### Archivos principales
 
@@ -131,7 +132,7 @@ Usuario → DOM Events → JavaScript Logic → localStorage → UI Update
 
 ---
 
-![Diagrama del flujo](assets/Diagrama.png)
+![Diagrama del flujo](Reto-Romi/Diagrama.png)
 
 
 
