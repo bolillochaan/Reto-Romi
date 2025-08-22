@@ -130,7 +130,7 @@ Usuario → DOM Events → JavaScript Logic → localStorage → UI Update
 
 ---
 
-![Diagrama del flujo](assets/Diagrama.png)
+![Diagrama del flujo](Diagrama.png)
 
 
 
